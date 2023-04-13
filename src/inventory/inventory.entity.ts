@@ -16,9 +16,8 @@ export class InventoryEntity extends BaseEntity {
   @Column()
   image: string;
 
-  // all creators that this user is following
-  @ManyToOne(() => UserEntity, (author) => author.email)
-  author: UserEntity;
+  @ManyToOne(() => UserEntity, (user) => user.email)
+  user: UserEntity;
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

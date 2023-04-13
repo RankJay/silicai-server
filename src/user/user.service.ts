@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { FindConditions, Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 
 @Injectable()
@@ -9,4 +9,21 @@ export class UserService {
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
+
+  async getUser(
+    filter: FindConditions<UserEntity>,
+    relations?: string[],
+    select?: (keyof UserEntity)[],
+  ): Promise<UserEntity> {
+    return this.userRepository.findOne({
+      where: { ...filter },
+      relations,
+      select,
+    });
+  }
+
+  async createUser(user: Partial<UserEntity>): Promise<UserEntity> {
+    const silicUser = this.userRepository.create(user);
+    return await this.userRepository.save(silicUser);
+  }
 }

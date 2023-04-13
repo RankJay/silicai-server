@@ -1,13 +1,20 @@
-import { Controller, Get, HttpCode } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
+import { SilicUserInventory } from './inventory.dto';
 
 @Controller('inventory')
 export class InventoryController {
-  constructor(private readonly InventoryService: InventoryService) {}
+  constructor(private readonly inventoryService: InventoryService) {}
 
-  @Get('/health')
+  @Get('/')
   @HttpCode(200)
-  healthStatus() {
-    return;
+  async getUser() {
+    return await this.inventoryService.getUserInventory({});
+  }
+
+  @Post('/create')
+  @HttpCode(200)
+  async createUser(@Body() createUser: SilicUserInventory) {
+    return await this.inventoryService.addToUserInventory(createUser);
   }
 }

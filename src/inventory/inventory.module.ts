@@ -1,10 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { InventoryController } from './inventory.controller';
 import { InventoryService } from './inventory.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { InventoryEntity } from './inventory.entity';
+import { UserModule } from 'src/user/user.module';
 
 @Module({
-  imports: [],
+  imports: [
+    TypeOrmModule.forFeature([InventoryEntity]),
+    forwardRef(() => UserModule),
+  ],
   controllers: [InventoryController],
   providers: [InventoryService],
 })
-export class AppModule {}
+export class InventoryModule {}

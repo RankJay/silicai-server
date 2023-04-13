@@ -1,9 +1,9 @@
 module.exports = [
   {
     type: 'postgres',
-    url: 'postgresql://postgres:KSvmIsYKeKnOJztSvhkS@containers-us-west-3.railway.app:7303/railway',
+    url: process.env.DATABASE_URL,
     entities: ['dist/**/*.entity{.ts,.js}'],
-    synchronize: false,
+    synchronize: true,
     migrations: ['dist/migrations/*{.ts,.js}'],
     cli: {
       migrationsDir: 'src/migrations',

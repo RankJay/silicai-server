@@ -25,8 +25,8 @@ export class UserEntity extends BaseEntity {
   @Column({ nullable: true })
   username?: string;
 
-  @ManyToOne(() => InventoryEntity, (creations) => creations)
-  author: InventoryEntity[];
+  @ManyToOne(() => InventoryEntity, (inventory) => inventory.user.email)
+  inventory: InventoryEntity[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;

@@ -5,7 +5,7 @@ export const DatabaseConfig = TypeOrmModule.forRootAsync({
   // inject: [ConfigService],
   useFactory: () => ({
     type: 'postgres',
-    url: 'postgresql://postgres:KSvmIsYKeKnOJztSvhkS@containers-us-west-3.railway.app:7303/railway',
+    url: 'postgresql://postgres:GjHBj9QVgyXN6mQWmpQQ@containers-us-west-2.railway.app:7937/railway',
     autoLoadEntities: true,
     synchronize: true,
   }),
