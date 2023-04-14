@@ -1,8 +1,7 @@
 # compiled output
-.env
 /dist
 /node_modules
-src/migrations/*
+.env
 
 # Logs
 logs

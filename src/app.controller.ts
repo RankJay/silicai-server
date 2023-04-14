@@ -1,19 +1,15 @@
-import { Controller, Get, HttpCode } from '@nestjs/common';
+import { Controller, Get } from "@nestjs/common";
 
 @Controller()
 export class AppController {
-  check: boolean;
-  constructor() {
-    this.check = true;
-  }
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  constructor() {}
 
-  @Get('/health')
-  @HttpCode(200)
-  healthStatus() {
-    if (this.check) {
-      return {
-        check: this.check,
-      };
-    }
+  @Get("/health")
+  async healthCheck() {
+    console.log(`=> [AppController] API Event: 'HEALTH_CHECK'`);
+    return {
+      status: 200,
+    };
   }
 }

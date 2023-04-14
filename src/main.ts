@@ -1,23 +1,27 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { ValidationPipe } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { NestFactory } from "@nestjs/core";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
+import { AppModule } from "src/app.module";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('api');
-  app.enableCors({
-    credentials: true,
-    origin: [
-      /.*vercel\.app$/,
-      'https://silic.ai',
-      'https://www.silic.ai',
-      'http://localhost:3000',
-    ],
-    methods: 'GET,POST,OPTIONS',
-    allowedHeaders:
-      'X-Requested-With, X-HTTP-Method-Override, Content-Type, Accept, Observe, Authorization, os',
+  app.enableCors();
+  await app.init();
+
+  const config = app.get<ConfigService>(ConfigService);
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.TCP,
+    options: {
+      port: config.get<number>("microservicePort"),
+      host: "0.0.0.0",
+    },
   });
-  await app.listen(3001);
-  console.log(`Application is running: ${await app.getUrl()}`);
-  console.log(`Microservice is running: ${8000}`);
+  app.useGlobalPipes(new ValidationPipe());
+
+  await app.listen(process.env.PORT);
+  await app.startAllMicroservices();
+
+  console.log(`Twitter Bot Project initiated!`);
 }
 bootstrap();
