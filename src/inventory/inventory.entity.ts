@@ -16,7 +16,7 @@ export class InventoryEntity extends BaseEntity {
   @Column()
   image: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.email)
+  @ManyToOne(() => UserEntity, (user) => user)
   user: UserEntity;
 
   @CreateDateColumn({ type: 'timestamptz' })

@@ -10,12 +10,16 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
+  async getAllUsers(): Promise<UserEntity[]> {
+    return await this.userRepository.find();
+  }
+
   async getUser(
     filter: FindConditions<UserEntity>,
     relations?: string[],
     select?: (keyof UserEntity)[],
   ): Promise<UserEntity> {
-    return this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { ...filter },
       relations,
       select,

@@ -8,8 +8,14 @@ export class UserController {
 
   @Get('/')
   @HttpCode(200)
-  async getUser() {
-    return await this.userService.getUser({ email: 'jay@mm' }, ['inventory']);
+  async getAllUser() {
+    return await this.userService.getAllUsers();
+  }
+
+  @Post('/get')
+  @HttpCode(200)
+  async getUser(@Body() body: { email: string }) {
+    return await this.userService.getUser({ email: body.email }, ['inventory']);
   }
 
   @Post('/create')

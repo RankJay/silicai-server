@@ -1,11 +1,12 @@
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 export const DatabaseConfig = TypeOrmModule.forRootAsync({
-  // imports: [ConfigModule],
-  // inject: [ConfigService],
-  useFactory: () => ({
+  imports: [ConfigModule],
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
     type: 'postgres',
-    url: 'postgresql://postgres:GjHBj9QVgyXN6mQWmpQQ@containers-us-west-2.railway.app:7937/railway',
+    url: configService.get('database'),
     autoLoadEntities: true,
     synchronize: true,
   }),

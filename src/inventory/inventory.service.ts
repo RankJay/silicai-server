@@ -13,12 +13,16 @@ export class InventoryService {
     @Inject(UserService) private userService: UserService,
   ) {}
 
+  async getAllUserInventory(): Promise<InventoryEntity[]> {
+    return await this.inventoryRepository.find({});
+  }
+
   async getUserInventory(
     filter: FindConditions<InventoryEntity>,
     relations?: string[],
     select?: (keyof InventoryEntity)[],
   ): Promise<InventoryEntity> {
-    return this.inventoryRepository.findOne({
+    return await this.inventoryRepository.findOne({
       where: { ...filter },
       relations,
       select,
