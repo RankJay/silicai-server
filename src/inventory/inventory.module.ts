@@ -12,5 +12,6 @@ import { UserModule } from 'src/user/user.module';
   ],
   controllers: [InventoryController],
   providers: [InventoryService],
+  exports: [InventoryService],
 })
 export class InventoryModule {}

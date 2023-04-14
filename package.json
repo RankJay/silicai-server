@@ -24,6 +24,8 @@
     "migration:revert": "rimraf dist && nest build && npx typeorm migration:revert"
   },
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.8.4",
+    "@leap-ai/sdk": "^0.0.119",
     "@nestjs/common": "^9.4.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.4.0",
