@@ -1,52 +1,74 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { FindConditions, Repository } from 'typeorm';
-import { InventoryEntity } from './inventory.entity';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { SilicUserInventory } from './inventory.dto';
 import { UserService } from 'src/user/user.service';
+import { ConfigService } from '@nestjs/config';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class InventoryService {
+  supabaseClient: SupabaseClient;
   constructor(
-    @InjectRepository(InventoryEntity)
-    private readonly inventoryRepository: Repository<InventoryEntity>,
     @Inject(UserService) private userService: UserService,
-  ) {}
-
-  async getAllUserInventory(): Promise<InventoryEntity[]> {
-    return await this.inventoryRepository.find({});
+    private readonly config: ConfigService,
+  ) {
+    this.supabaseClient = createClient(
+      this.config.get<string>('supbase_url'),
+      this.config.get<string>('supabase_key'),
+    );
   }
 
-  async getUserInventory(
-    filter: FindConditions<InventoryEntity>,
-    relations?: string[],
-    select?: (keyof InventoryEntity)[],
-  ): Promise<InventoryEntity> {
-    return await this.inventoryRepository.findOne({
-      where: { ...filter },
-      relations,
-      select,
-    });
+  async getAllUserInventory() {
+    const { data, error } = await this.supabaseClient
+      .from('inventory')
+      .select('*');
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+    return data;
   }
 
-  async addToUserInventory(body: SilicUserInventory): Promise<InventoryEntity> {
-    const exisitingSilicUser = await this.userService.getUser({
-      email: body.author,
-    });
+  async getUserInventory(id: string) {
+    const { data, error } = await this.supabaseClient
+      .from('inventory')
+      .select('*')
+      .eq('id', id);
 
-    console.log(exisitingSilicUser, body.author);
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+    return data;
+  }
 
-    if (exisitingSilicUser) {
-      const silicUserCreation = this.inventoryRepository.create({
-        image: body.image,
-        user: exisitingSilicUser,
-      });
-      return await this.inventoryRepository.save(silicUserCreation);
+  async addToUserInventory(body: SilicUserInventory) {
+    const exisitingSilicUser = await this.userService.getUser(body.user_id);
+
+    if (exisitingSilicUser.length > 0) {
+      const { data, error } = await this.supabaseClient
+        .from('inventory')
+        .insert({
+          image_id: body.image_id,
+          user_id: body.user_id,
+        });
+
+      if (error) {
+        console.log('Error', error);
+        throw new BadRequestException(error);
+      }
+      return data;
     } else {
-      const silicRandomUserCreation = this.inventoryRepository.create({
-        image: body.image,
-      });
-      return await this.inventoryRepository.save(silicRandomUserCreation);
+      const { data, error } = await this.supabaseClient
+        .from('inventory')
+        .insert({
+          image_id: body.image_id,
+        });
+      if (error) {
+        console.log('Error', error);
+        throw new BadRequestException(error);
+      }
+      return data;
     }
   }
 }
