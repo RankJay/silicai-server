@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { SilicUserInventory } from 'src/inventory/inventory.dto';
 import { Leap } from '@leap-ai/sdk';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AppService {
@@ -15,6 +16,7 @@ export class AppService {
       this.config.get<string>('supabase_key'),
     );
     this.leapClient = new Leap(this.config.get<string>('leap_client'));
+    this.leapClient.useModel(this.config.get<string>('model'));
   }
 
   async getAllUsers() {
@@ -71,6 +73,7 @@ export class AppService {
       } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
 
       const imageData = Buffer.from(response.data, 'binary');
+      this.addImageToBucket(user_id, imageData);
       const image = `data:image/png;base64,${imageData.toString('base64')}`;
 
       return image;
@@ -136,6 +139,23 @@ export class AppService {
         throw new BadRequestException(error);
       }
       return data;
+    }
+  }
+
+  async addImageToBucket(user_id: string, image: Buffer) {
+    const image_id = randomUUID();
+    const { data, error } = await this.supabaseClient.storage
+      .from('silicai-bucket')
+      .upload(`${this.config.get<string>('env')}/${image_id}.png`, image);
+    if (error) {
+      console.log('Error', error);
+    }
+
+    if (data.path) {
+      this.addToUserInventory({
+        user_id,
+        image_id,
+      });
     }
   }
 }

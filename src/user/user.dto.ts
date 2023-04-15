@@ -5,5 +5,5 @@ export class SilicUser {
   lastName?: string;
   username?: string;
   userAddress?: string;
-  created_at: string;
+  created_at?: string;
 }
