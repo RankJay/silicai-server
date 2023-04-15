@@ -1,19 +1,20 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
-import { Leap } from '@leap-ai/sdk';
 import axios from 'axios';
+import { SilicUserInventory } from 'src/inventory/inventory.dto';
+import { Leap } from '@leap-ai/sdk';
 
 @Injectable()
-export class UserService {
-  leapClient: Leap;
+export class AppService {
   supabaseClient: SupabaseClient;
+  leapClient: Leap;
   constructor(private readonly config: ConfigService) {
-    this.leapClient = new Leap(this.config.get<string>('leap_client'));
     this.supabaseClient = createClient(
       this.config.get<string>('supbase_url'),
       this.config.get<string>('supabase_key'),
     );
+    this.leapClient = new Leap(this.config.get<string>('leap_client'));
   }
 
   async getAllUsers() {
@@ -81,5 +82,60 @@ export class UserService {
       .from('silicai-bucket')
       .download(`${this.config.get<string>('env')}/${image_id}.png`);
     return data;
+  }
+
+  async getAllUserInventory() {
+    const { data, error } = await this.supabaseClient
+      .from('inventory')
+      .select('*');
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+    return data;
+  }
+
+  async getUserInventory(id: string) {
+    const { data, error } = await this.supabaseClient
+      .from('inventory')
+      .select('*')
+      .eq('id', id);
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+    return data;
+  }
+
+  async addToUserInventory(body: SilicUserInventory) {
+    const exisitingSilicUser = await this.getUser(body.user_id);
+
+    if (exisitingSilicUser.length > 0) {
+      const { data, error } = await this.supabaseClient
+        .from('inventory')
+        .insert({
+          image_id: body.image_id,
+          user_id: body.user_id,
+        });
+
+      if (error) {
+        console.log('Error', error);
+        throw new BadRequestException(error);
+      }
+      return data;
+    } else {
+      const { data, error } = await this.supabaseClient
+        .from('inventory')
+        .insert({
+          image_id: body.image_id,
+        });
+      if (error) {
+        console.log('Error', error);
+        throw new BadRequestException(error);
+      }
+      return data;
+    }
   }
 }
