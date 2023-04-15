@@ -15,12 +15,12 @@ export class InventoryController {
   @Post('/get')
   @HttpCode(200)
   async getUserInventory(@Body() body: { id: string }) {
-    return await this.inventoryService.getUserInventory({ id: body.id });
+    return await this.inventoryService.getUserInventory(body.id);
   }
 
   @Post('/create')
   @HttpCode(200)
-  async createUserInventory(@Body() createUser: SilicUserInventory) {
-    return await this.inventoryService.addToUserInventory(createUser);
+  async createUserInventory(@Body() createUserInventory: SilicUserInventory) {
+    return await this.inventoryService.addToUserInventory(createUserInventory);
   }
 }
