@@ -76,6 +76,6 @@ export class AppController {
   @Post('/user/inventory/get')
   @HttpCode(200)
   async getInventoryImage(@Body() body: { image_id: string }) {
-    return await this.appService.getInventoryImage(body.image_id);
+    return { image: await this.appService.getInventoryImage(body.image_id)};
   }
 }
