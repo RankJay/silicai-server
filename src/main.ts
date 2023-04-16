@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
   const config = app.get<ConfigService>(ConfigService);
-  // app.enableCors();
+  app.enableCors();
   await app.listen(3000);
   console.log(`Application is running: ${await app.getUrl()}`);
   console.log(`Microservice is running: ${8000}`);
