@@ -1,14 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import { ConfigService } from '@nestjs/config';
-import axios from 'axios';
-import { SilicUserInventory } from 'src/inventory/inventory.dto';
 import { Leap } from '@leap-ai/sdk';
+import { SupabaseClient, createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AppService {
-  supabaseClient: SupabaseClient;
+  private supabaseClient: SupabaseClient;
   leapClient: Leap;
   constructor(private readonly config: ConfigService) {
     this.supabaseClient = createClient(
@@ -29,11 +28,29 @@ export class AppService {
     return data;
   }
 
-  async getUser(id: string) {
+  async getUser(email: string) {
     const { data, error } = await this.supabaseClient
       .from('user')
       .select('*')
-      .eq('user_id', id);
+      .eq('email', email);
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+
+    // if (data.length == 0) {
+    //   const newUser = await this.createUser(email);
+    //   return newUser;
+    // }
+    return data;
+  }
+
+  async createUser(email: string) {
+    const { data, error } = await this.supabaseClient.from('user').insert({
+      user_id: randomUUID(),
+      email,
+    });
 
     if (error) {
       console.log('Error', error);
@@ -42,17 +59,7 @@ export class AppService {
     return data;
   }
 
-  async createUser(user: any) {
-    const { data, error } = await this.supabaseClient.from('user').insert(user);
-
-    if (error) {
-      console.log('Error', error);
-      throw new BadRequestException(error);
-    }
-    return data;
-  }
-
-  async generateImage(user_id: string, prompt: string) {
+  async generateImage(email: string, prompt: string) {
     const { data, error } = await this.leapClient.generate.generateImage({
       prompt: prompt,
       width: 1024,
@@ -73,7 +80,7 @@ export class AppService {
       } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
 
       const imageData = Buffer.from(response.data, 'binary');
-      this.addImageToBucket(user_id, imageData);
+      this.addImageToBucket(email, imageData);
       const image = `data:image/png;base64,${imageData.toString('base64')}`;
 
       return image;
@@ -99,11 +106,11 @@ export class AppService {
     return data;
   }
 
-  async getUserInventory(id: string) {
+  async getUserInventory(user_id: string) {
     const { data, error } = await this.supabaseClient
       .from('inventory')
       .select('*')
-      .eq('id', id);
+      .eq('user_id', user_id);
 
     if (error) {
       console.log('Error', error);
@@ -112,15 +119,15 @@ export class AppService {
     return data;
   }
 
-  async addToUserInventory(body: SilicUserInventory) {
-    const exisitingSilicUser = await this.getUser(body.user_id);
+  async addToUserInventory(body: { email: string; image_id: string }) {
+    const exisitingSilicUser = await this.getUser(body.email);
 
     if (exisitingSilicUser.length > 0) {
       const { data, error } = await this.supabaseClient
         .from('inventory')
         .insert({
           image_id: body.image_id,
-          user_id: body.user_id,
+          user_id: exisitingSilicUser['user_id'],
         });
 
       if (error) {
@@ -133,6 +140,7 @@ export class AppService {
         .from('inventory')
         .insert({
           image_id: body.image_id,
+          user_id: `0000-0000-0000-0000-0000`,
         });
       if (error) {
         console.log('Error', error);
@@ -142,7 +150,7 @@ export class AppService {
     }
   }
 
-  async addImageToBucket(user_id: string, image: Buffer) {
+  async addImageToBucket(email: string, image: Buffer) {
     const image_id = randomUUID();
     const { data, error } = await this.supabaseClient.storage
       .from('silicai-bucket')
@@ -153,7 +161,7 @@ export class AppService {
 
     if (data.path) {
       this.addToUserInventory({
-        user_id,
+        email,
         image_id,
       });
     }
