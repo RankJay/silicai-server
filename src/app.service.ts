@@ -2,21 +2,36 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Leap } from '@leap-ai/sdk';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { randomUUID } from 'crypto';
-import { url } from 'inspector';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom, catchError } from 'rxjs';
 
 @Injectable()
 export class AppService {
   private supabaseClient: SupabaseClient;
   leapClient: Leap;
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    private readonly config: ConfigService,
+    private readonly httpService: HttpService,
+  ) {
     this.supabaseClient = createClient(
       this.config.get<string>('supbase_url'),
       this.config.get<string>('supabase_key'),
     );
     this.leapClient = new Leap(this.config.get<string>('leap_client'));
     this.leapClient.useModel(this.config.get<string>('model'));
+  }
+
+  async convertImageURLtoImage(email: string, url: string) {
+    const response: {
+      data:
+        | WithImplicitCoercion<string>
+        | { [Symbol.toPrimitive](hint: 'string'): string };
+    } = await axios.get(url, { responseType: 'arraybuffer' });
+
+    const imageData = Buffer.from(response.data, 'binary');
+    this.addImageToBucket(email, imageData);
   }
 
   async getAllUsers() {
@@ -61,40 +76,32 @@ export class AppService {
   }
 
   async generateImage(email: string, prompt: string) {
-    const { data } = await axios({
-      method: 'POST',
-      url: 'https://stablediffusionapi.com/api/v3/dreambooth',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: {
-        key: 'lxqfWba1otjYgl8kZGmljd6SvzEoPRZCPV7mWWMs5HxoVL5EFlpcMK40IZKI',
-        model_id: 'midjourney',
-        prompt,
-        width: '1024',
-        height: '1024',
-        samples: '1',
-      },
-    });
+    const { data } = await firstValueFrom(
+      this.httpService
+        .post('https://stablediffusionapi.com/api/v3/dreambooth', {
+          key: 'lxqfWba1otjYgl8kZGmljd6SvzEoPRZCPV7mWWMs5HxoVL5EFlpcMK40IZKI',
+          model_id: 'midjourney',
+          prompt,
+          width: '512',
+          height: '512',
+          samples: '1',
+        })
+        .pipe(
+          catchError((error: AxiosError) => {
+            console.error(error.response.data);
+            throw 'An error happened!';
+          }),
+        ),
+    );
     // if (error) {
     //   console.log(error);
     //   throw new BadRequestException(
     //     'Something went wrong while generating the image!',
     //   );
     // }
-    if (data) {
-      const imageUrl = data.output[0];
-      const response: {
-        data:
-          | WithImplicitCoercion<string>
-          | { [Symbol.toPrimitive](hint: 'string'): string };
-      } = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-
-      const imageData = Buffer.from(response.data, 'binary');
-      this.addImageToBucket(email, imageData);
-      const image = `data:image/png;base64,${imageData.toString('base64')}`;
-
-      return image;
+    if (data.output[0]) {
+      this.convertImageURLtoImage(email, data.output[0]);
+      return data.output[0];
     }
   }
 
@@ -153,7 +160,7 @@ export class AppService {
         .from('inventory')
         .insert({
           image_id: body.image_id,
-          user_id: `0000-0000-0000-0000-0000`,
+          user_id: '3246e542-01a2-4777-a9b9-3c0e09f05878',
         });
       if (error) {
         console.log('Error', error);
