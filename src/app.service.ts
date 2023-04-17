@@ -82,8 +82,8 @@ export class AppService {
           key: 'lxqfWba1otjYgl8kZGmljd6SvzEoPRZCPV7mWWMs5HxoVL5EFlpcMK40IZKI',
           model_id: 'midjourney',
           prompt,
-          width: '512',
-          height: '512',
+          width: '1024',
+          height: '1024',
           samples: '1',
         })
         .pipe(
