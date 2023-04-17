@@ -69,13 +69,15 @@ export class AppController {
   @Post('/user/generate')
   @HttpCode(200)
   async generateImage(@Body() body: { email: string; prompt: string }) {
-    return await this.appService.generateImage(body.email, body.prompt);
+    return {
+      image: await this.appService.generateImage(body.email, body.prompt),
+    };
   }
 
   // Get an image from inventory
   @Post('/user/inventory/get')
   @HttpCode(200)
   async getInventoryImage(@Body() body: { image_id: string }) {
-    return { image: await this.appService.getInventoryImage(body.image_id)};
+    return { image: await this.appService.getInventoryImage(body.image_id) };
   }
 }
