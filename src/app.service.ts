@@ -4,6 +4,7 @@ import { Leap } from '@leap-ai/sdk';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
+import { url } from 'inspector';
 
 @Injectable()
 export class AppService {
@@ -60,19 +61,29 @@ export class AppService {
   }
 
   async generateImage(email: string, prompt: string) {
-    const { data, error } = await this.leapClient.generate.generateImage({
-      prompt: prompt,
-      width: 1024,
-      height: 1024,
+    const { data } = await axios({
+      method: 'POST',
+      url: 'https://stablediffusionapi.com/api/v3/dreambooth',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: {
+        key: 'lxqfWba1otjYgl8kZGmljd6SvzEoPRZCPV7mWWMs5HxoVL5EFlpcMK40IZKI',
+        model_id: 'midjourney',
+        prompt,
+        width: '1024',
+        height: '1024',
+        samples: '1',
+      },
     });
-    if (error) {
-      console.log(error);
-      throw new BadRequestException(
-        'Something went wrong while generating the image!',
-      );
-    }
+    // if (error) {
+    //   console.log(error);
+    //   throw new BadRequestException(
+    //     'Something went wrong while generating the image!',
+    //   );
+    // }
     if (data) {
-      const imageUrl = data.images[0].uri;
+      const imageUrl = data.output[0];
       const response: {
         data:
           | WithImplicitCoercion<string>
