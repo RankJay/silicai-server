@@ -50,12 +50,18 @@ export class AppController {
   @Post('/inventory/create')
   @HttpCode(200)
   async createUserInventory(
-    @Body() createUserInventory: { email: string; image: Buffer },
+    @Body()
+    createUserInventory: {
+      email: string;
+      image: Buffer;
+      prompt: string;
+    },
   ) {
-    return await this.appService.addImageToBucket(
-      createUserInventory.email,
-      createUserInventory.image,
-    );
+    return await this.appService.addImageToBucket({
+      email: createUserInventory.email,
+      image: createUserInventory.image,
+      prompt: createUserInventory.prompt,
+    });
   }
 
   // Create a new User
@@ -69,8 +75,12 @@ export class AppController {
   @Post('/user/generate')
   @HttpCode(200)
   async generateImage(@Body() body: { email: string; prompt: string }) {
+    const image = await this.appService.generateImageFromSD({
+      email: body.email,
+      prompt: body.prompt,
+    });
     return {
-      image: await this.appService.generateImage(body.email, body.prompt),
+      image,
     };
   }
 
