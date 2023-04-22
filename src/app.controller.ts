@@ -1,4 +1,13 @@
-import { Body, Controller, Get, HttpCode, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Options,
+  Post,
+  Response,
+} from '@nestjs/common';
+import { Response as ExpressResponse } from 'express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -6,6 +15,16 @@ export class AppController {
   check: boolean;
   constructor(private readonly appService: AppService) {
     this.check = true;
+  }
+
+  @Options('*')
+  options(@Response() res: ExpressResponse) {
+    console.log('Preflight Request');
+    return res.set({
+      'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, PATCH, DELETE',
+      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+      'Access-Control-Allow-Origin': '*',
+    });
   }
 
   @Get('/health')
