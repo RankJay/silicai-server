@@ -10,7 +10,7 @@ const envVars = () => ({
   supabase_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   clerk_pk: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   clerk_sk: process.env.CLERK_SECRET_KEY,
-  env: process.env.NODE_ENV,
+  databaseenv: process.env.DATABASEENVIRONMENT,
 });
 
 export const EnvConfig = ConfigModule.forRoot({

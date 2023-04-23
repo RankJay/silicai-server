@@ -159,7 +159,7 @@ export class AppService {
   async getInventoryImage(image_id: string) {
     const { data } = await this.supabaseClient.storage
       .from('silicai-bucket')
-      .download(`${this.config.get<string>('env')}/${image_id}.png`);
+      .download(`${this.config.get<string>('databaseenv')}/${image_id}.png`);
 
     const buffer = Buffer.from(new Uint8Array(await data.arrayBuffer()));
     return buffer.toString('base64');
@@ -234,7 +234,10 @@ export class AppService {
     const image_id = randomUUID();
     const { data, error } = await this.supabaseClient.storage
       .from('silicai-bucket')
-      .upload(`${this.config.get<string>('env')}/${image_id}.png`, body.image);
+      .upload(
+        `${this.config.get<string>('databaseenv')}/${image_id}.png`,
+        body.image,
+      );
     if (error) {
       console.log('Error', error);
     }
