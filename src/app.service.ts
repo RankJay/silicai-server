@@ -91,7 +91,25 @@ export class AppService {
     return data;
   }
 
-  async getUser(email: string) {
+  async getUserById(clerk_id: string) {
+    const { data, error } = await this.supabaseClient
+      .from('user')
+      .select('*')
+      .eq('clerk_id', clerk_id);
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+
+    // if (data.length == 0) {
+    //   const newUser = await this.createUser(email);
+    //   return newUser;
+    // }
+    return data;
+  }
+
+  async getUserByEmail(email: string) {
     const { data, error } = await this.supabaseClient
       .from('user')
       .select('*')
@@ -109,10 +127,11 @@ export class AppService {
     return data;
   }
 
-  async createUser(email: string) {
+  async createUser(email: string, clerk_id: string) {
     const { data, error } = await this.supabaseClient.from('user').insert({
       user_id: randomUUID(),
       email,
+      clerk_id,
     });
 
     if (error) {
@@ -217,7 +236,7 @@ export class AppService {
     image_id: string;
     prompt: string;
   }) {
-    const exisitingSilicUser = await this.getUser(body.email);
+    const exisitingSilicUser = await this.getUserByEmail(body.email);
 
     if (exisitingSilicUser.length > 0) {
       const { data, error } = await this.supabaseClient
