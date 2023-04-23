@@ -102,8 +102,8 @@ export class AppController {
   // Get a User inventory (history)
   @Post('/inventory/get')
   @HttpCode(200)
-  async getUserInventory(@Body() body: { user_id: string }) {
-    return await this.appService.getUserInventory(body.user_id);
+  async getUserInventory(@Body() body: { clerk_id: string }) {
+    return await this.appService.getUserInventory(body.clerk_id);
   }
 
   // Get a User
@@ -113,26 +113,19 @@ export class AppController {
     return await this.appService.getUserById(body.clerk_id);
   }
 
-  // Get a User
-  @Post('/user/get/email')
-  @HttpCode(200)
-  async getUserDataByEmail(@Body() body: { email: string }) {
-    return await this.appService.getUserByEmail(body.email);
-  }
-
   // Save Uploaded images to inventory
   @Post('/inventory/create')
   @HttpCode(200)
   async createUserInventory(
     @Body()
     createUserInventory: {
-      email: string;
+      clerk_id: string;
       image: Buffer;
       prompt: string;
     },
   ) {
     return await this.appService.addImageToBucket({
-      email: createUserInventory.email,
+      clerk_id: createUserInventory.clerk_id,
       image: createUserInventory.image,
       prompt: createUserInventory.prompt,
     });
@@ -148,9 +141,9 @@ export class AppController {
   // Generate Image from AI model
   @Post('/user/generate')
   @HttpCode(200)
-  async generateImage(@Body() body: { email: string; prompt: string }) {
-    const image = await this.appService.generateImageFromReplicate({
-      email: body.email,
+  async generateImage(@Body() body: { clerk_id: string; prompt: string }) {
+    const image = await this.appService.generateImageFromSD({
+      clerk_id: body.clerk_id,
       prompt: body.prompt,
     });
     return {
@@ -162,15 +155,15 @@ export class AppController {
   @Post('/user/save')
   @HttpCode(200)
   async saveImage(
-    @Body() body: { email: string; url: string; prompt: string },
+    @Body() body: { clerk_id: string; url: string; prompt: string },
   ) {
     console.log(
-      `[${new Date().toISOString()}] => email: ${
-        body.email
+      `[${new Date().toISOString()}] => clerk_id: ${
+        body.clerk_id
       }\n ==> Saving Image: ${body.url}`,
     );
     this.appService.convertImageURLtoImage({
-      email: body.email,
+      clerk_id: body.clerk_id,
       url: body.url,
       prompt: body.prompt,
     });

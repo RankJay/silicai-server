@@ -63,7 +63,7 @@ export class AppService {
   }
 
   async convertImageURLtoImage(body: {
-    email: string;
+    clerk_id: string;
     url: string;
     prompt: string;
   }) {
@@ -75,7 +75,7 @@ export class AppService {
 
     const imageData = Buffer.from(response.data, 'binary');
     this.addImageToBucket({
-      email: body.email,
+      clerk_id: body.clerk_id,
       image: imageData,
       prompt: body.prompt,
     });
@@ -103,25 +103,7 @@ export class AppService {
     }
 
     // if (data.length == 0) {
-    //   const newUser = await this.createUser(email);
-    //   return newUser;
-    // }
-    return data;
-  }
-
-  async getUserByEmail(email: string) {
-    const { data, error } = await this.supabaseClient
-      .from('user')
-      .select('*')
-      .eq('email', email);
-
-    if (error) {
-      console.log('Error', error);
-      throw new BadRequestException(error);
-    }
-
-    // if (data.length == 0) {
-    //   const newUser = await this.createUser(email);
+    //   const newUser = await this.createUser(clerk_id);
     //   return newUser;
     // }
     return data;
@@ -141,7 +123,7 @@ export class AppService {
     return data;
   }
 
-  async generateImageFromSD(body: { email: string; prompt: string }) {
+  async generateImageFromSD(body: { clerk_id: string; prompt: string }) {
     const { data, status } = await this.httpService.axiosRef.post(
       'https://stablediffusionapi.com/api/v3/dreambooth',
       {
@@ -160,40 +142,17 @@ export class AppService {
     //   );
     // }
     console.log(
-      `[${new Date().toISOString()}] => email: ${
-        body.email
+      `[${new Date().toISOString()}] => clerk_id: ${
+        body.clerk_id
       } responded with status ${status}\n ==> ${data.output}`,
     );
     if (data.output[0]) {
       this.convertImageURLtoImage({
-        email: body.email,
+        clerk_id: body.clerk_id,
         url: data.output[0],
         prompt: body.prompt,
       });
       return data.output[0];
-    }
-  }
-
-  async generateImageFromReplicate(body: { email: string; prompt: string }) {
-    const { data, status } = await this.httpService.axiosRef.post(
-      'https://api.replicate.com/v1/predictions',
-      {
-        version:
-          'db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf',
-        input: {
-          text: body.prompt,
-        },
-      },
-      {
-        headers: {
-          Authorization: `Token ${process.env.REPLICATE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-
-    if (status) {
-      console.log(data);
     }
   }
 
@@ -218,11 +177,11 @@ export class AppService {
     return data;
   }
 
-  async getUserInventory(user_id: string) {
+  async getUserInventory(clerk_id: string) {
     const { data, error } = await this.supabaseClient
       .from('inventory')
       .select('*')
-      .eq('user_id', user_id);
+      .eq('clerk_id', clerk_id);
 
     if (error) {
       console.log('Error', error);
@@ -232,18 +191,18 @@ export class AppService {
   }
 
   async addToUserInventory(body: {
-    email: string;
+    clerk_id: string;
     image_id: string;
     prompt: string;
   }) {
-    const exisitingSilicUser = await this.getUserByEmail(body.email);
+    const exisitingSilicUser = await this.getUserById(body.clerk_id);
 
     if (exisitingSilicUser.length > 0) {
       const { data, error } = await this.supabaseClient
         .from('inventory')
         .insert({
           image_id: body.image_id,
-          user_id: exisitingSilicUser['user_id'],
+          clerk_id: exisitingSilicUser['clerk_id'],
           prompt: body.prompt,
         });
 
@@ -257,7 +216,7 @@ export class AppService {
         .from('inventory')
         .insert({
           image_id: body.image_id,
-          user_id: '3246e542-01a2-4777-a9b9-3c0e09f05878',
+          clerk_id: '0000',
         });
       if (error) {
         console.log('Error', error);
@@ -268,7 +227,7 @@ export class AppService {
   }
 
   async addImageToBucket(body: {
-    email: string;
+    clerk_id: string;
     image: Buffer;
     prompt: string;
   }) {
@@ -282,7 +241,7 @@ export class AppService {
 
     if (data.path) {
       this.addToUserInventory({
-        email: body.email,
+        clerk_id: body.clerk_id,
         image_id,
         prompt: body.prompt,
       });
