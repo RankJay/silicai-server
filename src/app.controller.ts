@@ -65,7 +65,11 @@ export class AppController {
       }`,
     );
 
-    this.appService.createUser(body.data.email_addresses[0].email_address);
+    this.appService.createUser(
+      body.data.email_addresses[0].email_address,
+      body.data.id,
+    );
+    return;
   }
 
   // Stripe Session
@@ -105,8 +109,15 @@ export class AppController {
   // Get a User
   @Post('/user/get')
   @HttpCode(200)
-  async getUserData(@Body() body: { email: string }) {
-    return await this.appService.getUser(body.email);
+  async getUserDataById(@Body() body: { clerk_id: string }) {
+    return await this.appService.getUserById(body.clerk_id);
+  }
+
+  // Get a User
+  @Post('/user/get/email')
+  @HttpCode(200)
+  async getUserDataByEmail(@Body() body: { email: string }) {
+    return await this.appService.getUserByEmail(body.email);
   }
 
   // Save Uploaded images to inventory
@@ -130,8 +141,8 @@ export class AppController {
   // Create a new User
   @Post('/user/create')
   @HttpCode(200)
-  async createUser(@Body() body: { email: string }) {
-    return await this.appService.createUser(body.email);
+  async createUser(@Body() body: { email: string; clerk_id: string }) {
+    return await this.appService.createUser(body.email, body.clerk_id);
   }
 
   // Generate Image from AI model
