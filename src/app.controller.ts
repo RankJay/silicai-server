@@ -18,13 +18,18 @@ export class AppController {
   }
 
   @Options('*')
-  options(@Response() res: ExpressResponse) {
+  options(@Response() res: any) {
     console.log('Preflight Request');
-    return res.set({
-      'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, PATCH, DELETE',
-      'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-      'Access-Control-Allow-Origin': '*',
-    });
+    // let resp: ExpressResponse;
+    // resp.set({
+    //   'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, PATCH, DELETE',
+    //   'Access-Control-Allow-Headers': 'Content-Type,Authorization',
+    //   'Access-Control-Allow-Origin': '*',
+    // });
+
+    // res = resp;
+    // return res;
+    return;
   }
 
   @Get('/health')
@@ -94,13 +99,32 @@ export class AppController {
   @Post('/user/generate')
   @HttpCode(200)
   async generateImage(@Body() body: { email: string; prompt: string }) {
-    const image = await this.appService.generateImageFromSD({
+    const image = await this.appService.generateImageFromReplicate({
       email: body.email,
       prompt: body.prompt,
     });
     return {
       image,
     };
+  }
+
+  // Generate Image from AI model
+  @Post('/user/save')
+  @HttpCode(200)
+  async saveImage(
+    @Body() body: { email: string; url: string; prompt: string },
+  ) {
+    console.log(
+      `[${new Date().toISOString()}] => email: ${
+        body.email
+      }\n ==> Saving Image: ${body.url}`,
+    );
+    this.appService.convertImageURLtoImage({
+      email: body.email,
+      url: body.url,
+      prompt: body.prompt,
+    });
+    return;
   }
 
   // Get an image from inventory
