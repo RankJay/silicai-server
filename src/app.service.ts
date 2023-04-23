@@ -2,14 +2,16 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Leap } from '@leap-ai/sdk';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { randomUUID } from 'crypto';
 import { HttpService } from '@nestjs/axios';
+import Stripe from 'stripe';
 
 @Injectable()
 export class AppService {
   private supabaseClient: SupabaseClient;
   leapClient: Leap;
+  stripeClient: Stripe;
   constructor(
     private readonly config: ConfigService,
     private readonly httpService: HttpService,
@@ -18,8 +20,46 @@ export class AppService {
       this.config.get<string>('supbase_url'),
       this.config.get<string>('supabase_key'),
     );
+    this.stripeClient = new Stripe(this.config.get<string>('stripe_client'), {
+      apiVersion: '2022-11-15',
+    });
     this.leapClient = new Leap(this.config.get<string>('leap_client'));
     this.leapClient.useModel(this.config.get<string>('model'));
+  }
+
+  async stripeSession(data: {
+    origin: string;
+    image: string;
+    name: string;
+    description: string;
+    quantity: number;
+    price: number;
+  }) {
+    const transformedItem = {
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          images: [data.image],
+          name: data.name,
+          description: data.description,
+        },
+        unit_amount: data.price * 100,
+      },
+      quantity: data.quantity,
+    };
+
+    const session = await this.stripeClient.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [transformedItem],
+      mode: 'payment',
+      success_url: data.origin + '/new?status=success',
+      cancel_url: data.origin + '/new?status=cancel',
+      metadata: {
+        images: data.image,
+      },
+    });
+
+    return session;
   }
 
   async convertImageURLtoImage(body: {
@@ -133,7 +173,9 @@ export class AppService {
       },
     );
 
-    console.log(data);
+    if (status) {
+      console.log(data);
+    }
   }
 
   async getInventoryImage(image_id: string) {

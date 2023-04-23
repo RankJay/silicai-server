@@ -2,6 +2,7 @@ import { ConfigModule } from '@nestjs/config';
 
 const envVars = () => ({
   database: process.env.DATABASE_URL,
+  stripe_client: process.env.STRIPE_SK_KEY,
   leap_client: process.env.LEAP_API_KEY,
   replicate_client: process.env.REPLICATE_API_KEY,
   model: process.env.LEAP_AI_MODEL_ID,

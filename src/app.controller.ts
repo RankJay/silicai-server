@@ -5,9 +5,9 @@ import {
   HttpCode,
   Options,
   Post,
+  Request,
   Response,
 } from '@nestjs/common';
-import { Response as ExpressResponse } from 'express';
 import { AppService } from './app.service';
 
 @Controller()
@@ -19,16 +19,7 @@ export class AppController {
 
   @Options('*')
   options(@Response() res: any) {
-    console.log('Preflight Request');
-    // let resp: ExpressResponse;
-    // resp.set({
-    //   'Access-Control-Allow-Methods': 'HEAD, GET, POST, PUT, PATCH, DELETE',
-    //   'Access-Control-Allow-Headers': 'Content-Type,Authorization',
-    //   'Access-Control-Allow-Origin': '*',
-    // });
-
-    // res = resp;
-    // return res;
+    console.log('Preflight Request', res);
     return;
   }
 
@@ -54,6 +45,32 @@ export class AppController {
   @HttpCode(200)
   async getAllUserInventory() {
     return await this.appService.getAllUserInventory();
+  }
+
+  @Post('/stripe/session')
+  @HttpCode(200)
+  async stripeSession(
+    @Body()
+    body: {
+      image: string;
+      name: string;
+      description: string;
+      quantity: number;
+      price: number;
+    },
+    @Request() req: any,
+  ) {
+    console.log(
+      `[${new Date().toISOString()}] ==> Attempt to Stripe Checkout from: ${
+        req.headers.origin
+      }`,
+    );
+    const session = await this.appService.stripeSession({
+      origin: 'https://silic.ai',
+      ...body,
+    });
+
+    return session;
   }
 
   // Get a User inventory (history)
