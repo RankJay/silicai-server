@@ -47,6 +47,28 @@ export class AppController {
     return await this.appService.getAllUserInventory();
   }
 
+  // Clerk Webhook to receive events
+  @Post('/clerk/webhook')
+  @HttpCode(200)
+  async clerkWebhook(
+    @Body()
+    body: {
+      data: Record<any, any>;
+      object: string;
+      event: string;
+    },
+  ) {
+    console.log(body.event);
+    console.log(
+      `[${new Date().toISOString()}] ==> UserCreate Event: ${
+        body.data.email_addresses[0].email_address
+      }`,
+    );
+
+    this.appService.createUser(body.data.email_addresses[0].email_address);
+  }
+
+  // Stripe Session
   @Post('/stripe/session')
   @HttpCode(200)
   async stripeSession(
