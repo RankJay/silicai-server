@@ -202,7 +202,7 @@ export class AppService {
         .from('inventory')
         .insert({
           image_id: body.image_id,
-          clerk_id: exisitingSilicUser['clerk_id'],
+          clerk_id: await exisitingSilicUser[0].clerk_id,
           prompt: body.prompt,
         });
 
