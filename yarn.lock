@@ -713,14 +713,6 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
-"@leap-ai/sdk@^0.0.119":
-  version "0.0.119"
-  resolved "https://registry.yarnpkg.com/@leap-ai/sdk/-/sdk-0.0.119.tgz#988a870a1cd0baf6e3419a10616da1a62248f4be"
-  integrity sha512-siFRNmNLb2IaSE8gYKYt8fn9jpbv8gB1lMxGM46l5WKQr/2P+yGx4qh7btmHZ9e97mXDu+I75T0cNrdIbh7Jkg==
-  dependencies:
-    cross-fetch "^3.1.5"
-    form-data "^4.0.0"
-
 "@lukeed/csprng@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@lukeed/csprng/-/csprng-1.1.0.tgz#1e3e4bd05c1cc7a0b2ddbd8a03f39f6e4b5e6cfe"
@@ -3869,6 +3861,11 @@ neo-async@^2.6.2:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
+nestjs-fetch@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/nestjs-fetch/-/nestjs-fetch-0.0.4.tgz#b1018bf0e6e3e1640f4fc4b12d91c3ae79050de4"
+  integrity sha512-oOe8EmCa/QGu9/CZk6XY4iaRU+Twu47lQhNc/Fq3/6xHsjjxkl88vb7dSE87OZJj1XqpTEGQ+02lCLUN9Dsvlw==
+
 next-tick@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/next-tick/-/next-tick-1.1.0.tgz#1836ee30ad56d67ef281b22bd199f709449b35eb"
@@ -4316,10 +4313,10 @@ reflect-metadata@^0.1.13:
   resolved "https://registry.yarnpkg.com/reflect-metadata/-/reflect-metadata-0.1.13.tgz#67ae3ca57c972a2aa1642b10fe363fe32d49dc08"
   integrity sha512-Ts1Y/anZELhSsjMcU605fU9RE4Oi3p5ORujwbIKXfWa+0Zxs510Qrmrce5/Jowq3cHSZSJqBjypxmHarc+vEWg==
 
-replicate@^0.11.0:
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/replicate/-/replicate-0.11.0.tgz#59ca46f6a6895671e6c4fdf51c05fe09b4ce73b3"
-  integrity sha512-pF/+LXZ2CAFYJYaSXHStWttgzcOQkIMaQZg9D28ExGJuhvnhtfrho/qgEte4nsDjRFwN+Ye368g+fPrmh6Tgbw==
+replicate@^0.11.1:
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/replicate/-/replicate-0.11.1.tgz#9025bd74bf8b33d62cf89705dc8efdbe233cd1a9"
+  integrity sha512-PJ5qFQj7y4JfajiRg06ly1NYiH3z2QTuEGbNTBRO5t53dv55eDAc0gOqfVMUYbOvXi9m5jkDpz+W2TwSO8YiOg==
 
 require-directory@^2.1.1:
   version "2.1.1"
