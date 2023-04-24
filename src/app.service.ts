@@ -1,21 +1,33 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Leap } from '@leap-ai/sdk';
 import { SupabaseClient, createClient } from '@supabase/supabase-js';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
 import { HttpService } from '@nestjs/axios';
 import Stripe from 'stripe';
+import Replicate from 'replicate';
+import { FetchService } from 'nestjs-fetch';
 
 @Injectable()
 export class AppService {
   private supabaseClient: SupabaseClient;
-  leapClient: Leap;
   stripeClient: Stripe;
+  replicateClient: Replicate;
+  replicateModel: `${string}/${string}:${string}`;
+  dailyLimitUsers: { [clerk_id: string]: number } = {};
+  dailyLimitThreshold: number;
+  verifiedUsers: { [clerk_id: string]: number } = {};
+  fakeUsers: { [clerk_id: string]: number } = {};
   constructor(
     private readonly config: ConfigService,
     private readonly httpService: HttpService,
+    private readonly fetch: FetchService,
   ) {
+    this.replicateClient = new Replicate({
+      auth: '73b7775ce0cb8b967ce985eca2798e7d5a77c2b0',
+    });
+    this.replicateModel =
+      'stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf';
     this.supabaseClient = createClient(
       this.config.get<string>('supbase_url'),
       this.config.get<string>('supabase_key'),
@@ -23,10 +35,58 @@ export class AppService {
     this.stripeClient = new Stripe(this.config.get<string>('stripe_client'), {
       apiVersion: '2022-11-15',
     });
-    this.leapClient = new Leap(this.config.get<string>('leap_client'));
-    this.leapClient.useModel(this.config.get<string>('model'));
+    this.dailyLimitThreshold = this.config.get<number>('daily_limit');
   }
 
+  // Rate limiting Gaurd
+  async checkLastImageGenerated(clerk_id: string): Promise<boolean> {
+    if (this.fakeUsers[clerk_id]) {
+      console.log(
+        `[${new Date().toISOString()}] => 'FAKE' USER with clerk_id: ${clerk_id}`,
+      );
+
+      throw new BadRequestException(
+        'We have greylisted you. Reach out to us in order to get whitelisted.',
+      );
+      return false;
+    }
+    if (this.verifiedUsers[clerk_id]) {
+      if (new Date().getTime() - this.verifiedUsers[clerk_id] > 6000) {
+        if (this.dailyLimitUsers[clerk_id] <= this.dailyLimitThreshold) {
+          this.verifiedUsers[clerk_id] = new Date().getTime();
+          this.dailyLimitUsers[clerk_id] += 1;
+          return true;
+        }
+        console.log(
+          `[${new Date().toISOString()}] => 'DAILY_LIMIT' USER with clerk_id: ${clerk_id}`,
+        );
+        throw new BadRequestException('Daily Limit Reached.');
+        return false;
+      }
+      console.log(
+        `[${new Date().toISOString()}] => 'RATE_LIMIT' USER with clerk_id: ${clerk_id}`,
+      );
+      throw new BadRequestException('Rate Limit. Try again after sometime!');
+      return false;
+    }
+    const userExists = await this.getUserById(clerk_id);
+
+    if (userExists.length > 0) {
+      this.verifiedUsers[clerk_id] = new Date().getTime();
+      this.dailyLimitUsers[clerk_id] = 1;
+      return true;
+    }
+    console.log(
+      `[${new Date().toISOString()}] => 'NEW_FAKE' USER with clerk_id: ${clerk_id}`,
+    );
+    this.fakeUsers[clerk_id] = new Date().getTime();
+    throw new BadRequestException(
+      'We have greylisted you. Reach out to us in order to get whitelisted.',
+    );
+    return false;
+  }
+
+  // Create a new Stripe Session
   async stripeSession(data: {
     origin: string;
     image: string;
@@ -154,6 +214,28 @@ export class AppService {
       });
       return data.output[0];
     }
+  }
+
+  async generateImageFromReplicate(body: { clerk_id: string; prompt: string }) {
+    const output: any = await this.replicateClient.run(this.replicateModel, {
+      input: {
+        prompt: body.prompt,
+      },
+    });
+
+    console.log(
+      `[${new Date().toISOString()}] => clerk_id: ${
+        body.clerk_id
+      } responded.\n ==> ${await output[0]}`,
+    );
+    if (await output[0]) {
+      this.convertImageURLtoImage({
+        clerk_id: body.clerk_id,
+        url: await output[0],
+        prompt: body.prompt,
+      });
+    }
+    return { image: await output[0] };
   }
 
   async getInventoryImage(image_id: string) {

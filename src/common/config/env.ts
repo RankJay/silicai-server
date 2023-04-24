@@ -11,6 +11,7 @@ const envVars = () => ({
   clerk_pk: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   clerk_sk: process.env.CLERK_SECRET_KEY,
   databaseenv: process.env.DATABASEENVIRONMENT,
+  daily_limit: process.env.DAILY_GENERATE_LIMIT,
 });
 
 export const EnvConfig = ConfigModule.forRoot({

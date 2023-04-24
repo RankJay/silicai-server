@@ -142,12 +142,18 @@ export class AppController {
   @Post('/user/generate')
   @HttpCode(200)
   async generateImage(@Body() body: { clerk_id: string; prompt: string }) {
-    const image = await this.appService.generateImageFromSD({
-      clerk_id: body.clerk_id,
-      prompt: body.prompt,
-    });
+    if (await this.appService.checkLastImageGenerated(body.clerk_id)) {
+      const image = await this.appService.generateImageFromReplicate({
+        clerk_id: body.clerk_id,
+        prompt: body.prompt,
+      });
+      return {
+        image,
+      };
+    }
+
     return {
-      image,
+      error: 'rate limited',
     };
   }
 
