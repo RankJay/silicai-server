@@ -5,6 +5,7 @@ const envVars = () => ({
   stripe_client: process.env.STRIPE_SK_KEY,
   leap_client: process.env.LEAP_API_KEY,
   replicate_client: process.env.REPLICATE_API_KEY,
+  replicate_model: process.env.REPLICATE_MODEL,
   model: process.env.LEAP_AI_MODEL_ID,
   supbase_url: process.env.NEXT_PUBLIC_SUPABASE_URL,
   supabase_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,

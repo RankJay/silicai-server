@@ -83,6 +83,9 @@ export class AppController {
       description: string;
       quantity: number;
       price: number;
+      metadata: {
+        size: string;
+      };
     },
     @Request() req: any,
   ) {

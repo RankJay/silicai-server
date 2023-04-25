@@ -24,10 +24,10 @@ export class AppService {
     private readonly fetch: FetchService,
   ) {
     this.replicateClient = new Replicate({
-      auth: '73b7775ce0cb8b967ce985eca2798e7d5a77c2b0',
+      auth: this.config.get<string>('replicate_client'),
     });
     this.replicateModel =
-      'stability-ai/stable-diffusion:db21e45d3f7023abc2a46ee38a23973f6dce16bb082a930b0c49861f96d1e5bf';
+      this.config.get<`${string}/${string}:${string}`>('replicate_model');
     this.supabaseClient = createClient(
       this.config.get<string>('supbase_url'),
       this.config.get<string>('supabase_key'),
@@ -94,6 +94,7 @@ export class AppService {
     description: string;
     quantity: number;
     price: number;
+    metadata: { size: string };
   }) {
     const transformedItem = {
       price_data: {
@@ -116,6 +117,7 @@ export class AppService {
       cancel_url: data.origin + '/new?status=cancel',
       metadata: {
         images: data.image,
+        size: data.metadata.size,
       },
     });
 
