@@ -7,6 +7,7 @@ import { HttpService } from '@nestjs/axios';
 import Stripe from 'stripe';
 import Replicate from 'replicate';
 import { FetchService } from 'nestjs-fetch';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class AppService {
@@ -36,6 +37,15 @@ export class AppService {
       apiVersion: '2022-11-15',
     });
     this.dailyLimitThreshold = this.config.get<number>('daily_limit');
+  }
+
+  // Cron Job to reset daily limit of users.
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async runCronJob() {
+    this.dailyLimitUsers = {};
+    console.log(
+      `[${new Date().toISOString()}] => 'DAILY LIMIT RESET' Cron Job.`,
+    );
   }
 
   // Rate limiting Gaurd
