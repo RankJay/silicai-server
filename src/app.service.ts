@@ -43,6 +43,8 @@ export class AppService {
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async runCronJob() {
     this.dailyLimitUsers = {};
+    this.verifiedUsers = {};
+    this.fakeUsers = {};
     console.log(
       `[${new Date().toISOString()}] => 'DAILY LIMIT RESET' Cron Job.`,
     );
