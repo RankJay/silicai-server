@@ -79,12 +79,14 @@ export class AppController {
     @Body()
     body: {
       image: string;
+      imageId: string;
       name: string;
       description: string;
       quantity: number;
       price: number;
       metadata: {
         size: string;
+        style: string;
       };
     },
     @Request() req: any,

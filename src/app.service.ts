@@ -90,12 +90,14 @@ export class AppService {
   async stripeSession(data: {
     origin: string;
     image: string;
+    imageId: string;
     name: string;
     description: string;
     quantity: number;
     price: number;
-    metadata: { size: string };
+    metadata: { size: string; style: string };
   }) {
+    console.log(data);
     const transformedItem = {
       price_data: {
         currency: 'usd',
@@ -111,6 +113,14 @@ export class AppService {
 
     const session = await this.stripeClient.checkout.sessions.create({
       payment_method_types: ['card'],
+      payment_intent_data: {
+        metadata: {
+          images: data.image,
+          imageID: data.imageId,
+          size: data.metadata.size,
+          style: data.metadata.style,
+        },
+      },
       line_items: [transformedItem],
       mode: 'payment',
       success_url: data.origin + '/new?status=success',
@@ -118,6 +128,7 @@ export class AppService {
       metadata: {
         images: data.image,
         size: data.metadata.size,
+        style: data.metadata.style,
       },
     });
 
