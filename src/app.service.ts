@@ -133,6 +133,7 @@ export class AppService {
           style: data.metadata.style,
         },
       },
+      allow_promotion_codes: true,
       shipping_address_collection: {
         allowed_countries: ['US', 'GB', 'IN'],
       },
