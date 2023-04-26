@@ -121,6 +121,51 @@ export class AppService {
           style: data.metadata.style,
         },
       },
+      shipping_address_collection: {
+        allowed_countries: ['US', 'GB', 'IN'],
+      },
+      shipping_options: [
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: 0,
+              currency: 'usd',
+            },
+            display_name: 'Free Shipping (in US)',
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 7,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 15,
+              },
+            },
+          },
+        },
+        {
+          shipping_rate_data: {
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: this.config.get<number>('shipping_fee'),
+              currency: 'usd',
+            },
+            display_name: 'International Shipping',
+            delivery_estimate: {
+              minimum: {
+                unit: 'business_day',
+                value: 7,
+              },
+              maximum: {
+                unit: 'business_day',
+                value: 15,
+              },
+            },
+          },
+        },
+      ],
       line_items: [transformedItem],
       mode: 'payment',
       success_url: data.origin + '/new?status=success',

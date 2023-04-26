@@ -13,6 +13,7 @@ const envVars = () => ({
   clerk_sk: process.env.CLERK_SECRET_KEY,
   databaseenv: process.env.DATABASEENVIRONMENT,
   daily_limit: process.env.DAILY_GENERATE_LIMIT,
+  shipping_fee: process.env.SHIPPING_FEE,
 });
 
 export const EnvConfig = ConfigModule.forRoot({
