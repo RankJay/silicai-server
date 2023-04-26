@@ -79,6 +79,7 @@ export class AppController {
     @Body()
     body: {
       image: string;
+      imageId: string;
       name: string;
       description: string;
       quantity: number;

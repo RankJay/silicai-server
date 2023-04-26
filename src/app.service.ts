@@ -90,6 +90,7 @@ export class AppService {
   async stripeSession(data: {
     origin: string;
     image: string;
+    imageId: string;
     name: string;
     description: string;
     quantity: number;
@@ -115,7 +116,7 @@ export class AppService {
       payment_intent_data: {
         metadata: {
           images: data.image,
-          imageID: `TBA`,
+          imageID: data.imageId,
           size: data.metadata.size,
           style: data.metadata.style,
         },
