@@ -126,12 +126,14 @@ export class AppController {
     createUserInventory: {
       clerk_id: string;
       image: Buffer;
+      url: string;
       prompt: string;
     },
   ) {
     return await this.appService.addImageToBucket({
       clerk_id: createUserInventory.clerk_id,
       image: createUserInventory.image,
+      replicate_url: createUserInventory.url,
       prompt: createUserInventory.prompt,
     });
   }

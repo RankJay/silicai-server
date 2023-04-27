@@ -208,6 +208,7 @@ export class AppService {
     this.addImageToBucket({
       clerk_id: body.clerk_id,
       image: imageData,
+      replicate_url: body.url,
       prompt: body.prompt,
     });
   }
@@ -350,6 +351,7 @@ export class AppService {
   async addToUserInventory(body: {
     clerk_id: string;
     image_id: string;
+    replicate_url: string;
     prompt: string;
   }) {
     const exisitingSilicUser = await this.getUserById(body.clerk_id);
@@ -360,6 +362,7 @@ export class AppService {
         .insert({
           image_id: body.image_id,
           clerk_id: await exisitingSilicUser[0].clerk_id,
+          replicate_url: body.replicate_url,
           prompt: body.prompt,
         });
 
@@ -374,6 +377,8 @@ export class AppService {
         .insert({
           image_id: body.image_id,
           clerk_id: '0000',
+          replicate_url: body.replicate_url,
+          prompt: body.prompt,
         });
       if (error) {
         console.log('Error', error);
@@ -386,6 +391,7 @@ export class AppService {
   async addImageToBucket(body: {
     clerk_id: string;
     image: Buffer;
+    replicate_url: string;
     prompt: string;
   }) {
     const image_id = randomUUID();
@@ -403,6 +409,7 @@ export class AppService {
       this.addToUserInventory({
         clerk_id: body.clerk_id,
         image_id,
+        replicate_url: body.replicate_url,
         prompt: body.prompt,
       });
     }
