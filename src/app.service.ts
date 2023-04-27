@@ -241,6 +241,24 @@ export class AppService {
     return data;
   }
 
+  async getImageFromInventory(image_id: string) {
+    const { data, error } = await this.supabaseClient
+      .from('inventory')
+      .select('*')
+      .eq('image_id', image_id);
+
+    if (error) {
+      console.log('Error', error);
+      throw new BadRequestException(error);
+    }
+
+    // if (data.length == 0) {
+    //   const newUser = await this.createUser(clerk_id);
+    //   return newUser;
+    // }
+    return data;
+  }
+
   async createUser(email: string, clerk_id: string) {
     const { data, error } = await this.supabaseClient.from('user').insert({
       user_id: randomUUID(),

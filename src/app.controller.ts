@@ -104,6 +104,13 @@ export class AppController {
     return session;
   }
 
+  // Get an image from inventory (history)
+  @Post('/inventory/image')
+  @HttpCode(200)
+  async getImageFromInventory(@Body() body: { image_id: string }) {
+    return await this.appService.getImageFromInventory(body.image_id);
+  }
+
   // Get a User inventory (history)
   @Post('/inventory/get')
   @HttpCode(200)
