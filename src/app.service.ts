@@ -310,9 +310,13 @@ export class AppService {
   }
 
   async getInventoryImage(image_id: string) {
-    const { data } = await this.supabaseClient.storage
+    const { data, error } = await this.supabaseClient.storage
       .from('silicai-bucket')
       .download(`${this.config.get<string>('databaseenv')}/${image_id}.png`);
+
+    if (error) {
+      return null;
+    }
 
     const buffer = Buffer.from(new Uint8Array(await data.arrayBuffer()));
     return buffer.toString('base64');
