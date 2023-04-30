@@ -58,13 +58,14 @@ export class AppController {
       event: string;
     },
   ) {
-    console.log(body.event);
+    console.log(body.data);
     console.log(
       `[${new Date().toISOString()}] ==> UserCreate Event: ${
         body.data.email_addresses[0].email_address
       }`,
     );
 
+    this.appService.sendWelcomEmail(body.data);
     this.appService.createUser(
       body.data.email_addresses[0].email_address,
       body.data.id,

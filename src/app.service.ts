@@ -196,6 +196,51 @@ export class AppService {
     return session;
   }
 
+  async sendWelcomEmail(data: Record<string, any>) {
+    this.httpService.axiosRef
+      .post(
+        `https://api.sendinblue.com/v3/smtp/email`,
+        {
+          to: [
+            {
+              email: data.email_addresses[0].email_address,
+              name: data.username,
+            },
+          ],
+          templateId: 1,
+          // params: {
+          //   name: 'Aamir',
+          //   surname: 'Patel',
+          // },
+          headers: {
+            'X-Mailin-custom':
+              'custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3',
+            charset: 'iso-8859-1',
+          },
+        },
+        {
+          headers: {
+            'api-key': this.config.get<string>('sendinblue_client'),
+          },
+        },
+      )
+      .then((res) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Welcome Email Sent: ${
+            data.email_addresses[0].email_address
+          }`,
+        );
+      })
+      .catch((err) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Error Event: ${
+            data.email_addresses[0].email_address
+          }\n${err}`,
+        );
+      });
+    return;
+  }
+
   async convertImageURLtoImage(body: {
     clerk_id: string;
     url: string;
