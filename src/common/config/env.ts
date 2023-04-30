@@ -11,6 +11,7 @@ const envVars = () => ({
   supabase_key: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
   clerk_pk: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
   clerk_sk: process.env.CLERK_SECRET_KEY,
+  sendinblue_client: process.env.SENDINBLUE_API_KEY,
   databaseenv: process.env.DATABASEENVIRONMENT,
   daily_limit: process.env.DAILY_GENERATE_LIMIT,
   shipping_fee: process.env.SHIPPING_FEE,
