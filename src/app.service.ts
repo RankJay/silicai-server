@@ -135,6 +135,7 @@ export class AppService {
         },
       },
       client_reference_id: data.referral,
+      customer_creation: 'always',
       phone_number_collection: {
         enabled: true,
       },
