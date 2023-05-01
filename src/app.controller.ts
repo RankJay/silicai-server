@@ -89,6 +89,7 @@ export class AppController {
         size: string;
         style: string;
       };
+      referral: string;
     },
     @Request() req: any,
   ) {
