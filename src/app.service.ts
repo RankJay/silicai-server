@@ -358,11 +358,27 @@ export class AppService {
   }
 
   async generateImageFromReplicate(body: { clerk_id: string; prompt: string }) {
-    const output: any = await this.replicateClient.run(this.replicateModel, {
-      input: {
-        prompt: body.prompt,
-      },
-    });
+    let output: any;
+
+    await this.replicateClient
+      .run(this.replicateModel, {
+        input: {
+          prompt: body.prompt,
+        },
+      })
+      .then((resp) => {
+        output = resp;
+      })
+      .catch((err) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Error Event: ${
+            body.clerk_id
+          }\n${err}`,
+        );
+        throw new BadRequestException(
+          'Sorry our model has detected inappropriate content. We understand your prompt may not reflect that and apologize. Please try again',
+        );
+      });
 
     console.log(
       `[${new Date().toISOString()}] => clerk_id: ${
