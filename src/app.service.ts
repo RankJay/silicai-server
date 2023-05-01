@@ -108,6 +108,7 @@ export class AppService {
     quantity: number;
     price: number;
     metadata: { size: string; style: string };
+    referral: string;
   }) {
     console.log(data);
     const transformedItem = {
@@ -133,6 +134,7 @@ export class AppService {
           style: data.metadata.style,
         },
       },
+      client_reference_id: data.referral,
       phone_number_collection: {
         enabled: true,
       },
