@@ -195,7 +195,7 @@ export class AppService {
         },
       ],
       line_items: [transformedItem],
-      mode: 'payment',
+      mode: 'setup',
       success_url: data.origin + '/new?status=success',
       cancel_url: data.origin + '/new?status=cancel',
       metadata: {
