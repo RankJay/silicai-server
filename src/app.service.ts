@@ -98,6 +98,15 @@ export class AppService {
     return false;
   }
 
+  // Create a new Stripe SetupIntent
+  async stripeSetupIntent() {
+    const setupIntent = await this.stripeClient.setupIntents.create({
+      payment_method_types: ['card'],
+    });
+
+    return setupIntent;
+  }
+
   // Create a new Stripe Session
   async stripeSession(data: {
     origin: string;

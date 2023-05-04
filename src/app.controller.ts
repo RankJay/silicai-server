@@ -106,6 +106,36 @@ export class AppController {
     return session;
   }
 
+  // Stripe SetupIntent
+  @Post('/stripe/intent')
+  @HttpCode(200)
+  async stripeSetupIntent(
+    @Body()
+    body: {
+      image: string;
+      imageId: string;
+      name: string;
+      description: string;
+      quantity: number;
+      price: number;
+      metadata: {
+        size: string;
+        style: string;
+      };
+      referral: string;
+    },
+    @Request() req: any,
+  ) {
+    console.log(
+      `[${new Date().toISOString()}] ==> Attempt to Stripe SetupIntent from: ${
+        req.headers.origin
+      }`,
+    );
+    const session = await this.appService.stripeSetupIntent();
+
+    return session;
+  }
+
   // Get an image from inventory (history)
   @Post('/inventory/image')
   @HttpCode(200)
