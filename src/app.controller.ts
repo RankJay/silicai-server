@@ -222,6 +222,25 @@ export class AppController {
     return;
   }
 
+  // Generate Image from AI model
+  @Post('/user/feel')
+  @HttpCode(200)
+  async feelImage(
+    @Body() body: { clerk_id: string; image_id: string; isLike: boolean },
+  ) {
+    console.log(
+      `[${new Date().toISOString()}] => clerk_id: ${
+        body.clerk_id
+      }\n ==> Recording Like/Dislike: ${body.clerk_id}`,
+    );
+    this.appService.feelImage({
+      clerk_id: body.clerk_id,
+      image_id: body.image_id,
+      isLike: body.isLike,
+    });
+    return;
+  }
+
   // Get an image from inventory
   @Post('/user/inventory/get')
   @HttpCode(200)
