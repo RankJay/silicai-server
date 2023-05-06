@@ -283,6 +283,22 @@ export class AppService {
     return data;
   }
 
+  async feelImage(body: {
+    clerk_id: string;
+    image_id: string;
+    isLike: boolean;
+  }) {
+    const { data, error } = await this.supabaseClient.from('feel').insert({
+      image_id: body.image_id,
+      clerk_id: body.clerk_id,
+      isLike: body.isLike,
+    });
+
+    if (error) {
+      console.log('Error', error);
+    }
+  }
+
   async getUserById(clerk_id: string) {
     const { data, error } = await this.supabaseClient
       .from('user')
