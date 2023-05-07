@@ -157,7 +157,7 @@ export class AppService {
           shipping_rate_data: {
             type: 'fixed_amount',
             fixed_amount: {
-              amount: 4,
+              amount: 4 * 100,
               currency: 'usd',
             },
             display_name: 'Free Shipping (in US)',
@@ -177,7 +177,7 @@ export class AppService {
           shipping_rate_data: {
             type: 'fixed_amount',
             fixed_amount: {
-              amount: this.config.get<number>('shipping_fee'),
+              amount: this.config.get<number>('shipping_fee') * 100,
               currency: 'usd',
             },
             display_name: 'International Shipping',
