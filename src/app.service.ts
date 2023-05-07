@@ -157,7 +157,7 @@ export class AppService {
           shipping_rate_data: {
             type: 'fixed_amount',
             fixed_amount: {
-              amount: 0,
+              amount: 4,
               currency: 'usd',
             },
             display_name: 'Free Shipping (in US)',
