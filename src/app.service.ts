@@ -150,7 +150,20 @@ export class AppService {
       },
       allow_promotion_codes: true,
       shipping_address_collection: {
-        allowed_countries: ['US', 'GB', 'IN'],
+        allowed_countries: [
+          'US',
+          'GB',
+          'IN',
+          'CA',
+          'DE',
+          'FR',
+          'AU',
+          'JP',
+          'AE',
+          'PL',
+          'SE',
+          'CH',
+        ],
       },
       shipping_options: [
         {
