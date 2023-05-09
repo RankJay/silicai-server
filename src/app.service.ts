@@ -266,6 +266,51 @@ export class AppService {
     return;
   }
 
+  async sendConfirmationEmail(data: Record<string, any>) {
+    this.httpService.axiosRef
+      .post(
+        `https://api.sendinblue.com/v3/smtp/email`,
+        {
+          to: [
+            {
+              email: data.email,
+              name: data.username,
+            },
+          ],
+          templateId: 2,
+          // params: {
+          //   name: 'Aamir',
+          //   surname: 'Patel',
+          // },
+          headers: {
+            'X-Mailin-custom':
+              'custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3',
+            charset: 'iso-8859-1',
+          },
+        },
+        {
+          headers: {
+            'api-key': this.config.get<string>('sendinblue_client'),
+          },
+        },
+      )
+      .then((res) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Successfull Order Email Sent: ${
+            data.email
+          }`,
+        );
+      })
+      .catch((err) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Error Event: ${
+            data.email
+          }\n${err}`,
+        );
+      });
+    return;
+  }
+
   async convertImageURLtoImage(body: {
     clerk_id: string;
     url: string;

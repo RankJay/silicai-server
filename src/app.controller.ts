@@ -73,6 +73,27 @@ export class AppController {
     return;
   }
 
+  // Clerk Webhook to receive events
+  @Post('/stripe/webhook')
+  @HttpCode(200)
+  async stripeWebhook(
+    @Body()
+    body: Record<any, any>,
+  ) {
+    console.log(body);
+    console.log(
+      `[${new Date().toISOString()}] ==> Stripe Event: ${body.object.status}`,
+    );
+
+    if (body.object.status === 'succeeded' && body.object.receipt_email) {
+      this.appService.sendConfirmationEmail({
+        email: body.object.receipt_email,
+        username: body.object.shipping.name,
+      });
+    }
+    return;
+  }
+
   // Stripe Session
   @Post('/stripe/session')
   @HttpCode(200)
