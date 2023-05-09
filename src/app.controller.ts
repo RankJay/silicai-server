@@ -82,13 +82,18 @@ export class AppController {
   ) {
     console.log(body);
     console.log(
-      `[${new Date().toISOString()}] ==> Stripe Event: ${body.object.status}`,
+      `[${new Date().toISOString()}] ==> Stripe Event: ${
+        body.data.object.status
+      }`,
     );
 
-    if (body.object.status === 'succeeded' && body.object.receipt_email) {
+    if (
+      body.data.object.status === 'succeeded' &&
+      body.data.object.receipt_email
+    ) {
       this.appService.sendConfirmationEmail({
-        email: body.object.receipt_email,
-        username: body.object.shipping.name,
+        email: body.data.object.receipt_email,
+        username: body.data.object.shipping.name,
       });
     }
     return;
