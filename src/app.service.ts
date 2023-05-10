@@ -311,6 +311,52 @@ export class AppService {
     return;
   }
 
+  async sendErrorEmail(data: Record<string, any>) {
+    this.httpService.axiosRef
+      .post(
+        `https://api.brevo.com/v3/smtp/email`,
+        {
+          sender: {
+            email: 'info@silc.ai',
+            name: 'Silic AI',
+          },
+          to: [
+            {
+              email: data.email,
+              name: data.username,
+            },
+          ],
+          subject: 'Error Notification!',
+          htmlContent: `<html><head></head><body><p>Alert Notification!</p><p>Prompt: ${data.prompt}</p><p>UserID: ${data.userId}</p><p>Error: ${data.error}</p></body></html>`,
+          headers: {
+            'X-Mailin-custom':
+              'custom_header_1:custom_value_1|custom_header_2:custom_value_2|custom_header_3:custom_value_3',
+            charset: 'iso-8859-1',
+          },
+        },
+        {
+          headers: {
+            'api-key': this.config.get<string>('sendinblue_client'),
+          },
+        },
+      )
+      .then((res) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Successfull Alert Email Sent: ${
+            data.email
+          }`,
+        );
+      })
+      .catch((err) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Error Event: ${
+            data.email
+          }\n${err}`,
+        );
+      });
+    return;
+  }
+
   async convertImageURLtoImage(body: {
     clerk_id: string;
     url: string;
@@ -458,6 +504,20 @@ export class AppService {
             body.clerk_id
           }\n${err}`,
         );
+        this.sendErrorEmail({
+          email: 'rank01jay01@gmail.com',
+          username: 'jayrank',
+          prompt: body.prompt,
+          userId: body.clerk_id,
+          error: err,
+        });
+        this.sendErrorEmail({
+          email: 'aampatel12@gmail.com',
+          username: 'aamirpatel',
+          prompt: body.prompt,
+          userId: body.clerk_id,
+          error: err,
+        });
         throw new BadRequestException(
           'Hello. We had an issue processing your design. Our systenma may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
         );
