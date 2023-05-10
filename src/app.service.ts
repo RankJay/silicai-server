@@ -459,7 +459,7 @@ export class AppService {
           }\n${err}`,
         );
         throw new BadRequestException(
-          'Sorry our model has detected inappropriate content. We understand your prompt may not reflect that and apologize. Please try again',
+          'Hello. We had an issue processing your design. Our systenma may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
         );
       });
 
