@@ -148,7 +148,7 @@ export class AppService {
       phone_number_collection: {
         enabled: true,
       },
-      allow_promotion_codes: true,
+      // allow_promotion_codes: true,
       shipping_address_collection: {
         allowed_countries: [
           'US',
