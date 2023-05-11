@@ -534,7 +534,7 @@ export class AppService {
           error: err,
         });
         throw new BadRequestException(
-          'Hello. We had an issue processing your design. Our systenma may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
+          'Hello. We had an issue processing your design. Our system may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
         );
       });
 
