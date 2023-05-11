@@ -58,7 +58,6 @@ export class AppController {
       event: string;
     },
   ) {
-    console.log(body.data);
     console.log(
       `[${new Date().toISOString()}] ==> UserCreate Event: ${
         body.data.email_addresses[0].email_address
