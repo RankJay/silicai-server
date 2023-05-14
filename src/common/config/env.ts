@@ -15,6 +15,7 @@ const envVars = () => ({
   databaseenv: process.env.DATABASEENVIRONMENT,
   daily_limit: process.env.DAILY_GENERATE_LIMIT,
   shipping_fee: process.env.SHIPPING_FEE,
+  wombo_api_key: process.env.WOMBO_API_KEY,
 });
 
 export const EnvConfig = ConfigModule.forRoot({
