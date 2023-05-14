@@ -501,6 +501,98 @@ export class AppService {
     }
   }
 
+  async delay(time: number) {
+    return await new Promise((resolve) => {
+      const targetTime = Date.now() + time;
+      const interval = setInterval(() => {
+        if (Date.now() >= targetTime) {
+          clearInterval(interval);
+          resolve(null);
+        }
+      }, 100);
+    });
+  }
+
+  async generateImageFromWombo(body: { clerk_id: string; prompt: string }) {
+    try {
+      console.log(
+        `[${new Date().toISOString()}] => clerk_id: ${
+          body.clerk_id
+        } Creating WOMBO Task`,
+      );
+      const response1 = await this.httpService.axiosRef.post(
+        'https://api.luan.tools/api/tasks/',
+        {
+          use_target_image: false,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${this.config.get<string>('wombo_api_key')}`,
+          },
+        },
+      );
+      if (response1.status === 200) {
+        console.log(
+          `[${new Date().toISOString()}] => clerk_id: ${
+            body.clerk_id
+          } Putting Prompt in WOMBO Task`,
+        );
+        const response2 = await this.httpService.axiosRef.put(
+          `https://api.luan.tools/api/tasks/${await response1.data.id}`,
+          {
+            input_spec: {
+              prompt: body.prompt,
+              style: 7,
+              height: 1024,
+              width: 1024,
+              target_image_weight: 0.1,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${this.config.get<string>(
+                'wombo_api_key',
+              )}`,
+            },
+          },
+        );
+        if (response2.status === 200) {
+          // Wait for 6 seconds before fetch request
+          await this.delay(6000);
+          console.log(
+            `[${new Date().toISOString()}] => clerk_id: ${
+              body.clerk_id
+            } Getting WOMBO Task`,
+          );
+
+          const response3 = await this.httpService.axiosRef.get(
+            `https://api.luan.tools/api/tasks/${await response1.data.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${this.config.get<string>(
+                  'wombo_api_key',
+                )}`,
+              },
+            },
+          );
+
+          console.log(
+            `[${new Date().toISOString()}] => clerk_id: ${
+              body.clerk_id
+            } responded.\n ==> ${await response3.data.result}`,
+          );
+
+          return response3.data.result;
+        }
+      }
+    } catch (err) {
+      console.log('Error', err);
+      throw new BadRequestException(
+        'Hello. We had an issue processing your design. Our system may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
+      );
+    }
+  }
+
   async generateImageFromReplicate(body: { clerk_id: string; prompt: string }) {
     let output: any;
 

@@ -212,8 +212,19 @@ export class AppController {
   // Generate Image from AI model
   @Post('/user/generate')
   @HttpCode(200)
-  async generateImage(@Body() body: { clerk_id: string; prompt: string }) {
+  async generateImage(
+    @Body() body: { clerk_id: string; prompt: string; wombo: boolean },
+  ) {
     if (await this.appService.checkLastImageGenerated(body.clerk_id)) {
+      if (body.wombo) {
+        const image = await this.appService.generateImageFromWombo({
+          clerk_id: body.clerk_id,
+          prompt: body.prompt,
+        });
+        return {
+          image,
+        };
+      }
       const image = await this.appService.generateImageFromReplicate({
         clerk_id: body.clerk_id,
         prompt: body.prompt,
