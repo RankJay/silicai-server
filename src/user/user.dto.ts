@@ -7,3 +7,8 @@ export class SilicUser {
   userAddress?: string;
   created_at?: string;
 }
+
+export enum ModelType {
+  WOMBO = 'WOMBO',
+  REPLICATE = 'REPLICATE',
+}
