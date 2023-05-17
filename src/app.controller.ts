@@ -9,6 +9,7 @@ import {
   Response,
 } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ModelType } from './user/user.dto';
 
 @Controller()
 export class AppController {
@@ -213,10 +214,10 @@ export class AppController {
   @Post('/user/generate')
   @HttpCode(200)
   async generateImage(
-    @Body() body: { clerk_id: string; prompt: string; wombo: boolean },
+    @Body() body: { clerk_id: string; prompt: string; modelType: ModelType },
   ) {
     if (await this.appService.checkLastImageGenerated(body.clerk_id)) {
-      if (body.wombo) {
+      if (body.modelType === ModelType.WOMBO) {
         const image = await this.appService.generateImageFromWombo({
           clerk_id: body.clerk_id,
           prompt: body.prompt,

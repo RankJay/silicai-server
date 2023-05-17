@@ -542,7 +542,7 @@ export class AppService {
           {
             input_spec: {
               prompt: body.prompt,
-              style: 7,
+              style: 84,
               height: 1024,
               width: 1024,
               target_image_weight: 0.1,
@@ -558,7 +558,7 @@ export class AppService {
         );
         if (response2.status === 200) {
           // Wait for 6 seconds before fetch request
-          await this.delay(6000);
+          await this.delay(10000);
           console.log(
             `[${new Date().toISOString()}] => clerk_id: ${
               body.clerk_id
@@ -642,7 +642,7 @@ export class AppService {
         prompt: body.prompt,
       });
     }
-    return { image: await output[0] };
+    return await output[0];
   }
 
   async getInventoryImage(image_id: string) {
