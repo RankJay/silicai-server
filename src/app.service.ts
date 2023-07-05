@@ -188,7 +188,7 @@ export class AppService {
               amount: 4 * 100,
               currency: 'usd',
             },
-            display_name: 'Free Shipping (in US)',
+            display_name: 'US Shipping',
             delivery_estimate: {
               minimum: {
                 unit: 'business_day',
