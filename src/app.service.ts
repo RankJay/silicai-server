@@ -645,6 +645,65 @@ export class AppService {
     return await output[0];
   }
 
+  async generateImageFromOpenAI(body: { clerk_id: string; prompt: string }) {
+    let output: any;
+
+    await this.httpService.axiosRef.post(
+      'https://api.openai.com/v1/images/generations',
+      {
+        "model": "dall-e-3",
+        "prompt": prompt,
+        "n": 1,
+        "size": "1024x1024"
+      },
+      {
+        headers: {
+          "Authorization": `Bearer ${this.config.get<string>('openai_api_key')}`
+        }
+      }
+    ).then((resp) => {
+        output = resp;
+      })
+      .catch((err) => {
+        console.log(
+          `[${new Date().toISOString()}] ==> Error Event: ${
+            body.clerk_id
+          }\n${err}`,
+        );
+        this.sendErrorEmail({
+          email: 'rank01jay01@gmail.com',
+          username: 'jayrank',
+          prompt: body.prompt,
+          userId: body.clerk_id,
+          error: err,
+        });
+        this.sendErrorEmail({
+          email: 'aampatel12@gmail.com',
+          username: 'aamirpatel',
+          prompt: body.prompt,
+          userId: body.clerk_id,
+          error: err,
+        });
+        throw new BadRequestException(
+          'Hello. We had an issue processing your design. Our system may be at capacity or there is an issue with your prompt that has caused image generation to fail. Please try again or come back to silic.ai at a later time. We apologize for any inconvenience.',
+        );
+      });
+
+    console.log(
+      `[${new Date().toISOString()}] => clerk_id: ${
+        body.clerk_id
+      } responded.\n ==> ${await output.data[0]}`,
+    );
+    if (await output.data[0]) {
+      this.convertImageURLtoImage({
+        clerk_id: body.clerk_id,
+        url: await output.data[0].url,
+        prompt: body.prompt,
+      });
+    }
+    return await output[0];
+  }
+
   async getInventoryImage(image_id: string) {
     const { data, error } = await this.supabaseClient.storage
       .from('silicai-bucket')

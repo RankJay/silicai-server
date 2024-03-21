@@ -217,16 +217,16 @@ export class AppController {
     @Body() body: { clerk_id: string; prompt: string; modelType: ModelType },
   ) {
     if (await this.appService.checkLastImageGenerated(body.clerk_id)) {
-      if (body.modelType === ModelType.WOMBO) {
-        const image = await this.appService.generateImageFromWombo({
-          clerk_id: body.clerk_id,
-          prompt: body.prompt,
-        });
-        return {
-          image,
-        };
-      }
-      const image = await this.appService.generateImageFromReplicate({
+      // if (body.modelType === ModelType.WOMBO) {
+      //   const image = await this.appService.generateImageFromWombo({
+      //     clerk_id: body.clerk_id,
+      //     prompt: body.prompt,
+      //   });
+      //   return {
+      //     image,
+      //   };
+      // }
+      const image = await this.appService.generateImageFromOpenAI({
         clerk_id: body.clerk_id,
         prompt: body.prompt,
       });
@@ -259,7 +259,7 @@ export class AppController {
     return;
   }
 
-  // Generate Image from AI model
+  // Record Like/Dislike
   @Post('/user/feel')
   @HttpCode(200)
   async feelImage(
